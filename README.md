@@ -17,7 +17,7 @@
 ___
 Перед игрой скорректируй Settings.PLAYERS_COUNT в соответствии с количеством игроков!
 ___
-Готовый онлайн-компилятор с актуальным кодом: https://www.programiz.com/online-compiler/8I96KVsNyboWG
+Готовый онлайн-компилятор с актуальным кодом: https://www.programiz.com/online-compiler/8eYlyCL5g8jMs
 ___
 Пример игрушечного дробовика:
 
