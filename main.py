@@ -1,15 +1,24 @@
 import random
 
 
-class Settings:
+class LobbySettings:
+    """Настройки лобби."""
+
     PLAYERS_COUNT: int = 4
+
+
+class Settings:
+    """Системные настройки."""
+
     MIN_LIVE_RATIO: float = 0.2
     MAX_LIVE_RATIO: float = 0.7
+    MAX_BULLETS_COUNT: int = 8
+    MAGAZINE_CAPACITY: int = 4
     LIVE_BULLET: str = '🔴'
     BLANK_BULLET: str = '🔵'
 
     @classmethod
-    def get_bullet(self, is_live: bool) -> str:
+    def get_bullet_symbol(self, is_live: bool) -> str:
         return self.LIVE_BULLET if is_live else self.BLANK_BULLET
 
 
@@ -22,21 +31,22 @@ NUMS_MAPPER: dict[int, str] = {
     6: '6️⃣',
     7: '7️⃣',
     8: '8️⃣',
-    9: '9️⃣',
-    10: '🔟',
 }
 
 
-def print_line():
-    print('-'*40)
-
-
 def charge_bullets():
-    if not (2 <= Settings.PLAYERS_COUNT <= 4):
+    if not (2 <= LobbySettings.PLAYERS_COUNT <= 4):
         raise ValueError("Необходимо от 2 до 4 игроков")
 
-    total: int = random.randint(Settings.PLAYERS_COUNT, Settings.PLAYERS_COUNT + 4)
-    min_live: int = max(1, int(total * Settings.MIN_LIVE_RATIO))
+    total: int = random.randint(LobbySettings.PLAYERS_COUNT, Settings.MAX_BULLETS_COUNT)
+    if total > 6:
+        min_live: int = 3
+    elif total > 4:
+        min_live: int = 2
+    else:
+        min_live: int = 1
+
+    min_live: int = max(min_live, int(total * Settings.MIN_LIVE_RATIO))
     max_live: int = max(min_live, int(total * Settings.MAX_LIVE_RATIO))
     num_live: int = random.randint(min_live, max_live)
     return [True] * num_live + [False] * (total - num_live)
@@ -47,25 +57,25 @@ def display_bullets():
 
     random.shuffle(bullets)
     print(
-        f'Скажи игрокам, что в игре:\n{NUMS_MAPPER[bullets.count(True)]}{Settings.LIVE_BULLET} '
-        f'и {NUMS_MAPPER[bullets.count(False)]}{Settings.BLANK_BULLET}'
+        'Скажи игрокам, что в игре:\n'
+        f'{NUMS_MAPPER[bullets.count(True)]}{Settings.LIVE_BULLET} и {NUMS_MAPPER[bullets.count(False)]}{Settings.BLANK_BULLET}\n'
+        'Или покажи им гильзы:\n'
+        f'{"".join([Settings.get_bullet_symbol(bullet) for bullet in bullets])}'
     )
-    print(f'Или покажи им гильзы:\n{"".join([Settings.get_bullet(bullet) for bullet in bullets])}')
-    
-    print_line()
-    random.shuffle(bullets)
-    print(f'Порядок патронов в игре:\n{"".join([Settings.get_bullet(bullet) for bullet in bullets])}')
-    
-    print_line()
-    print('Заряди патроны в магазин/дуло в порядке:')
-    middle: int = 5 if len(bullets) <= 5 else (len(bullets) + 1) // 2
-    for p in (bullets[:middle], bullets[middle:]):
-        if p:
-            print(
-                f'{''.join([Settings.get_bullet(bullet) for bullet in p[:0:-1]])}/'
-                f'{Settings.get_bullet(p[0])}'
-            )
 
+    print('-'*28)
+
+    random.shuffle(bullets)
+    if len(bullets) > Settings.MAGAZINE_CAPACITY:
+        middle: int = (len(bullets) + 1) // 2
+        bullets.insert(middle, ' | ')
+    print(
+        'Заряжай патроны в магазин,\n'
+        'каждую секцию справа-налево:\n'
+        f'{"".join([Settings.get_bullet_symbol(bullet) if isinstance(bullet, bool) else bullet for bullet in bullets])}\n'
+        'Не забудь передернуть цевьё!'
+    )
+    
 
 if __name__ == '__main__':
     display_bullets()
